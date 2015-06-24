@@ -131,6 +131,7 @@ int main (int argc, char** argv)
 	glutMainLoop ();
 
 	free (input_buf);
+	free (pic);
 }
 
 void draw (void)
