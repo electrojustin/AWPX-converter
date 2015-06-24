@@ -72,6 +72,7 @@ int main (int argc, char** argv)
 	actual_layer_hdr.opts = layer_table [0].opts;
 
 	//Print some basic information about the image
+	printf ("Layers: %d\n", actual_file_header.layer_count);
 	printf ("Size: %d by %d\n", actual_layer_hdr.width, actual_layer_hdr.height);
 	printf ("Pixel packing type: %d\n", actual_layer_hdr.pix_pack_type);
 	printf ("Color type: %d\n", actual_layer_hdr.color_pack_type);
@@ -91,7 +92,7 @@ int main (int argc, char** argv)
 	for (i = 0; i < width*height; i ++)
 	{
 		//Get the index into the color pallette the current pixel is using
-		current_color_ind = *(input_buf + sizeof (awpx_hdr) + sizeof (layer_hdr) + actual_layer_hdr.pixel_offset + i);
+		current_color_ind = *(unsigned char*)(input_buf + sizeof (awpx_hdr) + sizeof (layer_hdr) + actual_layer_hdr.pixel_offset + i);
 
 		//Copy the color into our draw buffer
 		//NOTE: DESPITE WHAT THE DOC SAYS, THE COLOR PALLETTE IS ALWAYS RGBA, NOT RGB EVEN THOUGH colorPackType IS 0

@@ -75,7 +75,7 @@ int main (int argc, char** argv)
 	for (i = 0; i < actual_layer_hdr.height * actual_layer_hdr.width; i ++)
 	{
 		//Get the index into the color pallette the current pixel is using
-		current_color_ind = *(input_buf + sizeof (awpx_hdr) + sizeof (layer_hdr) + actual_layer_hdr.pixel_offset + i);
+		current_color_ind = *(unsigned char*)(input_buf + sizeof (awpx_hdr) + sizeof (layer_hdr) + actual_layer_hdr.pixel_offset + i);
 
 		//Copy pixel data
 		current_row = rows [i / actual_layer_hdr.width];
