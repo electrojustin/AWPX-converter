@@ -47,6 +47,13 @@ int main (int argc, char** argv)
 	file_header = (awpx_hdr*)input_buf;
 	layer_table = (layer_hdr*)(input_buf + sizeof (awpx_hdr));
 
+	//Basic sanity check
+	if (file_header->format != 0x58505741)
+	{
+		printf ("Not an AWPX file\n");
+		exit (-1);
+	}
+
 	//Deal with endian nonsense
 	actual_file_header.version = __bswap_16 (file_header->version);
 	actual_file_header.layer_count = __bswap_16 (file_header->layer_count);
@@ -66,6 +73,15 @@ int main (int argc, char** argv)
 	actual_layer_hdr.pix_lace_type = layer_table [0].pix_lace_type;
 	actual_layer_hdr.color_pack_type = layer_table [0].color_pack_type;
 	actual_layer_hdr.opts = layer_table [0].opts;
+
+	//Makes sure the width matches the number of bytes per row.
+	if (actual_layer_hdr.width != actual_layer_hdr.row_bytes)
+	{
+		//They don't match, somethings not right.
+		printf ("WARNING: AWPX file appears to be corrupt! Bytes per row does not match width!\nAttempting to repair...\n");
+		//Go with the row bytes, they're more accurate in my experience
+		actual_layer_hdr.width = actual_layer_hdr.row_bytes;
+	}
 
 	//Allocate memory for the final image
 	rows = (png_bytep*)malloc (actual_layer_hdr.height * sizeof (png_bytep));

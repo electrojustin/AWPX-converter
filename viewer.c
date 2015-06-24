@@ -51,6 +51,13 @@ int main (int argc, char** argv)
 	file_header = (awpx_hdr*)input_buf;
 	layer_table = (layer_hdr*)(input_buf + sizeof (awpx_hdr));
 
+	//Basic sanity check
+	if (file_header->format != 0x58505741)
+	{
+		printf ("Not an AWPX file\n");
+		exit (-1);
+	}
+
 	//Deal with endian nonsense
 	actual_file_header.version = __bswap_16 (file_header->version);
 	actual_file_header.layer_count = __bswap_16 (file_header->layer_count);
@@ -82,6 +89,15 @@ int main (int argc, char** argv)
 	printf ("Depth: %d\n", actual_layer_hdr.depth);
 	printf ("Ignore color: %08x\n", actual_layer_hdr.trans_color);
 	printf ("Row bytes: %d\n", actual_layer_hdr.row_bytes);
+
+	//Makes sure the width matches the number of bytes per row.
+	if (actual_layer_hdr.width != actual_layer_hdr.row_bytes)
+	{
+		//They don't match, somethings not right.
+		printf ("WARNING: AWPX file appears to be corrupt! Bytes per row does not match width!\nAttempting to repair...\n");
+		//Go with the row bytes, they're more accurate in my experience
+		actual_layer_hdr.width = actual_layer_hdr.row_bytes;
+	}
 
 	//Allocate space for the draw buffer
 	width = actual_layer_hdr.width;
